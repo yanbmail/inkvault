@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f4ee">
+<title>墨库 InkVault · 个人知识库</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="boot" class="boot">
+  <div class="boot-mark">墨</div>
+  <div class="boot-text">正在打开知识库…</div>
+</div>
+
+<div id="login" class="login hidden">
+  <div class="login-card">
+    <div class="seal">墨</div>
+    <h1>墨库 <span>InkVault</span></h1>
+    <p class="login-sub" id="loginSub">输入访问码，打开你的知识库</p>
+    <form id="loginForm" autocomplete="off">
+      <input id="pinInput" inputmode="numeric" maxlength="12" placeholder="访问码" aria-label="访问码">
+      <button type="submit" class="btn primary block">进入</button>
+    </form>
+    <p class="login-hint">访问码显示在服务端启动窗口，也可在「设置 → 访问与安全」中查看。<br>数据只保存在你自己的电脑上。</p>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+  <aside class="rail">
+    <div class="rail-logo" title="墨库 InkVault">墨</div>
+    <nav class="rail-nav">
+      <button class="rail-btn active" data-nav="notes" title="笔记"><i data-icon="file-text"></i></button>
+      <button class="rail-btn" data-nav="search" title="搜索 ⌘K"><i data-icon="search"></i></button>
+      <button class="rail-btn" data-nav="stats" title="统计"><i data-icon="chart"></i></button>
+      <button class="rail-btn" data-nav="import" title="导入"><i data-icon="download"></i></button>
+    </nav>
+    <div class="rail-bottom">
+      <button class="rail-btn" data-nav="settings" title="设置"><i data-icon="settings"></i></button>
+    </div>
+  </aside>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-head">
+      <div class="brand">
+        <div class="brand-name" id="vaultName">我的知识库</div>
+        <div class="brand-sub">本地优先 · <span id="vaultVersion">v1.0</span></div>
+      </div>
+      <button class="icon-btn only-mobile" id="sidebarClose" title="关闭"><i data-icon="x"></i></button>
+    </div>
+
+    <button class="search-trigger" id="searchTrigger">
+      <span class="st-icon"><i data-icon="search"></i></span>
+      <span>搜索笔记、标签、语法…</span>
+      <kbd>⌘K</kbd>
+    </button>
+
+    <nav class="nav" id="navList">
+      <button class="nav-item active" data-view="all">
+        <span class="ni-icon"><i data-icon="layers"></i></span><span class="ni-label">全部笔记</span><span class="ni-count" data-count="all">0</span>
+      </button>
+      <button class="nav-item" data-view="starred">
+        <span class="ni-icon"><i data-icon="star"></i></span><span class="ni-label">星标</span><span class="ni-count" data-count="starred">0</span>
+      </button>
+      <button class="nav-item" data-view="pinned">
+        <span class="ni-icon"><i data-icon="pin"></i></span><span class="ni-label">置顶</span><span class="ni-count" data-count="pinned">0</span>
+      </button>
+      <button class="nav-item" data-view="recent">
+        <span class="ni-icon"><i data-icon="clock"></i></span><span class="ni-label">最近编辑</span>
+      </button>
+      <button class="nav-item" data-view="archived">
+        <span class="ni-icon"><i data-icon="archive"></i></span><span class="ni-label">归档</span><span class="ni-count" data-count="archived">0</span>
+      </button>
+      <button class="nav-item" data-view="trash">
+        <span class="ni-icon"><i data-icon="trash"></i></span><span class="ni-label">回收站</span><span class="ni-count" data-count="trash">0</span>
+      </button>
+    </nav>
+
+    <div class="side-section" id="notebookSection">
+      <div class="side-title">
+        <span>笔记本</span>
+        <button class="icon-btn tiny" id="addNotebook" title="新建笔记本"><i data-icon="plus"></i></button>
+      </div>
+      <div id="notebookTree" class="tree"></div>
+    </div>
+
+    <div class="side-section" id="tagSection">
+      <div class="side-title">
+        <span>标签</span>
+        <button class="icon-btn tiny" id="addTag" title="新建标签"><i data-icon="plus"></i></button>
+      </div>
+      <div id="tagCloud" class="tagcloud"></div>
+    </div>
+
+    <div class="side-section" id="savedSection">
+      <div class="side-title"><span>已保存的搜索</span></div>
+      <div id="savedSearches" class="saved-list"></div>
+    </div>
+
+    <div class="sidebar-foot">
+      <button class="foot-btn" id="backupBtn"><i data-icon="database"></i><span>备份与恢复</span></button>
+      <button class="foot-btn" id="syncBtn"><i data-icon="refresh"></i><span>设备同步</span></button>
+    </div>
+  </aside>
+
+  <main class="list-pane" id="listPane">
+    <header class="list-head">
+      <div class="list-title-row">
+        <button class="icon-btn only-mobile" id="openSidebar"><i data-icon="menu"></i></button>
+        <div>
+          <h2 id="listTitle">全部笔记</h2>
+          <p id="listSubtitle">0 篇</p>
+        </div>
+        <div class="list-actions">
+          <button class="icon-btn" id="sortBtn" title="排序方式"><i data-icon="sort"></i></button>
+          <button class="btn primary small" id="newNoteBtn"><i data-icon="plus"></i>新建</button>
+        </div>
+      </div>
+      <div class="filter-chips" id="filterChips"></div>
+    </header>
+    <div id="noteList" class="note-list"></div>
+    <button class="list-loadmore hidden" id="loadMore">加载更多</button>
+    <div class="list-empty hidden" id="listEmpty">
+      <div class="empty-illustration"><i data-icon="feather"></i></div>
+      <h3>还没有笔记</h3>
+      <p>按下 <kbd>⌘N</kbd> 写下第一条想法。</p>
+      <button class="btn primary" id="emptyNewBtn">新建笔记</button>
+    </div>
+  </main>
+
+  <section class="editor-pane" id="editorPane">
+    <div class="editor-empty" id="editorEmpty">
+      <div class="ee-mark">墨</div>
+      <p>选择左侧笔记，或新建一篇</p>
+      <div class="ee-keys">
+        <span><kbd>⌘K</kbd> 搜索</span><span><kbd>⌘N</kbd> 新建</span><span><kbd>⌘S</kbd> 保存</span>
+      </div>
+    </div>
+
+    <div class="editor-wrap hidden" id="editorWrap">
+      <header class="editor-head">
+        <div class="editor-head-left">
+          <button class="icon-btn only-mobile" id="backToList"><i data-icon="arrow-left"></i></button>
+          <div class="nb-picker" id="notebookPicker">
+            <span class="dot" id="nbDot"></span>
+            <select id="notebookSelect" aria-label="所属笔记本"></select>
+          </div>
+          <span class="save-state" id="saveState"></span>
+        </div>
+        <div class="editor-head-right">
+          <button class="icon-btn" id="starBtn" title="星标"><i data-icon="star"></i></button>
+          <button class="icon-btn" id="pinBtn" title="置顶"><i data-icon="pin"></i></button>
+          <button class="icon-btn" id="versionsBtn" title="历史版本"><i data-icon="history"></i></button>
+          <button class="icon-btn" id="exportNoteBtn" title="导出这篇"><i data-icon="download"></i></button>
+          <button class="icon-btn" id="moreBtn" title="更多"><i data-icon="more"></i></button>
+        </div>
+      </header>
+
+      <div class="editor-scroll" id="editorScroll">
+        <div class="editor-paper" id="editorPaper">
+          <input class="note-title" id="noteTitle" placeholder="无标题笔记" spellcheck="false">
+          <div class="note-meta" id="noteMetaBar">
+            <div class="tag-editor" id="tagEditor"></div>
+            <span class="meta-dot">·</span>
+            <span id="metaDates"></span>
+          </div>
+          <div class="field-editor hidden" id="fieldEditor"></div>
+
+          <div class="editor-toolbar" id="toolbar">
+            <div class="tb-group">
+              <button class="tb-btn" data-md="h1" title="一级标题">H1</button>
+              <button class="tb-btn" data-md="h2" title="二级标题">H2</button>
+              <button class="tb-btn" data-md="h3" title="三级标题">H3</button>
+            </div>
+            <div class="tb-sep"></div>
+            <div class="tb-group">
+              <button class="tb-btn" data-md="bold" title="加粗 ⌘B"><i data-icon="bold"></i></button>
+              <button class="tb-btn" data-md="italic" title="斜体 ⌘I"><i data-icon="italic"></i></button>
+              <button class="tb-btn" data-md="strike" title="删除线"><i data-icon="strike"></i></button>
+              <button class="tb-btn" data-md="code" title="行内代码"><i data-icon="code"></i></button>
+            </div>
+            <div class="tb-sep"></div>
+            <div class="tb-group">
+              <button class="tb-btn" data-md="ul" title="无序列表"><i data-icon="list"></i></button>
+              <button class="tb-btn" data-md="ol" title="有序列表"><i data-icon="list-ordered"></i></button>
+              <button class="tb-btn" data-md="task" title="待办"><i data-icon="check-square"></i></button>
+              <button class="tb-btn" data-md="quote" title="引用"><i data-icon="quote"></i></button>
+            </div>
+            <div class="tb-sep"></div>
+            <div class="tb-group">
+              <button class="tb-btn" data-md="link" title="链接"><i data-icon="link"></i></button>
+              <button class="tb-btn" data-md="image" title="插入图片"><i data-icon="image"></i></button>
+              <button class="tb-btn" data-md="table" title="表格"><i data-icon="table"></i></button>
+              <button class="tb-btn" data-md="divider" title="分隔线"><i data-icon="minus"></i></button>
+            </div>
+            <div class="tb-spacer"></div>
+            <div class="tb-group view-switch" id="viewSwitch">
+              <button class="tb-btn active" data-viewmode="split" title="分屏"><i data-icon="columns"></i></button>
+              <button class="tb-btn" data-viewmode="edit" title="纯编辑"><i data-icon="edit"></i></button>
+              <button class="tb-btn" data-viewmode="preview" title="预览"><i data-icon="eye"></i></button>
+            </div>
+            <button class="tb-btn" id="outlineBtn" title="大纲"><i data-icon="list-tree"></i></button>
+          </div>
+
+          <div class="editor-split" id="editorSplit">
+            <div class="composer">
+              <textarea id="content" placeholder="开始写点什么… 支持 Markdown，可直接粘贴图片。" spellcheck="false"></textarea>
+            </div>
+            <div class="preview-wrap"><div class="md" id="preview"></div></div>
+            <aside class="outline hidden" id="outline"></aside>
+          </div>
+        </div>
+      </div>
+
+      <footer class="statusbar">
+        <div class="sb-left">
+          <span id="wordCount">0 字</span>
+          <span class="sb-sep"></span>
+          <span id="readTime">约 1 分钟</span>
+          <span class="sb-sep"></span>
+          <span id="saveTime"></span>
+        </div>
+        <div class="sb-right">
+          <span id="attachCount"></span>
+          <span id="charCount"></span>
+        </div>
+      </footer>
+    </div>
+  </section>
+</div>
+
+<div id="overlay" class="overlay hidden"></div>
+<div id="drawer" class="drawer hidden"></div>
+<div id="modalRoot" class="modal hidden"></div>
+<div id="palette" class="palette hidden">
+  <div class="palette-box">
+    <div class="palette-input-row">
+      <i data-icon="search"></i>
+      <input id="paletteInput" placeholder="搜索笔记，或输入命令…" autocomplete="off">
+      <kbd>Esc</kbd>
+    </div>
+    <div class="palette-results" id="paletteResults"></div>
+    <div class="palette-foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span><span><kbd>↵</kbd> 打开</span><span><kbd>⌘K</kbd> 关闭</span>
+    </div>
+  </div>
+</div>
+
+<div id="toasts" class="toasts"></div>
+<div id="mobileBar" class="mobile-bar">
+  <button data-nav="notes" class="active"><i data-icon="file-text"></i><span>笔记</span></button>
+  <button data-nav="search"><i data-icon="search"></i><span>搜索</span></button>
+  <button id="mobileNew" class="mobile-new"><i data-icon="plus"></i></button>
+  <button data-nav="stats"><i data-icon="chart"></i><span>统计</span></button>
+  <button data-nav="settings"><i data-icon="settings"></i><span>设置</span></button>
+</div>
+
+<script src="icons.js"></script>
+<script src="md.js"></script>
+<script src="core.js"></script>
+<script src="ui.js"></script>
+<script src="panels.js"></script>
+<script src="local.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
